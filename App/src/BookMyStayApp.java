@@ -1,49 +1,43 @@
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * ============================================================
- * MAIN CLASS - UseCase2RoomInitialization
+ * MAIN CLASS - UseCase3InventorySetup
  * ============================================================
  *
- * Use Case 2: Basic Room Types & Static Availability
+ * Use Case 3: Centralized Room Inventory Management
  *
  * Description:
- * Demonstrates room initialization using domain models
- * before introducing centralized inventory management.
- *
- * Availability is represented using simple variables
- * to highlight limitations.
+ * Demonstrates centralized inventory management using HashMap.
+ * Room availability is stored in a single source of truth,
+ * eliminating scattered variables and improving scalability.
  *
  * @author Bhoomi
- * @version 2.1
+ * @version 3.1
  */
-public class UseCase2RoomInitialization {
-
-    /**
-     * Application entry point.
-     *
-     * @param args Command-line arguments
-     */
+public class UseCase3InventorySetup {
     public static void main(String[] args) {
-        System.out.println("Hotel Room Initialization\n");
+        System.out.println("Hotel Room Inventory Initialization\n");
 
-        // Static availability representation
-        int singleRoomAvailability = 5;
-        int doubleRoomAvailability = 3;
-        int suiteRoomAvailability = 2;
+        // Initialize inventory
+        RoomInventory inventory = new RoomInventory();
 
-        // Create room objects
-        Room single = new SingleRoom();
-        Room doubleR = new DoubleRoom();
-        Room suite = new SuiteRoom();
+        // Display current availability
+        System.out.println("=== Current Room Availability ===");
+        for (Map.Entry<String, Integer> entry : inventory.getRoomAvailability().entrySet()) {
+            System.out.println(entry.getKey() + " : " + entry.getValue());
+        }
 
-        // Display details
-        System.out.println("Single Room:");
-        single.displayRoomDetails(singleRoomAvailability);
+        // Update availability example
+        System.out.println("\nUpdating availability...");
+        inventory.updateAvailability("SuiteRoom", 1);
 
-        System.out.println("\nDouble Room:");
-        doubleR.displayRoomDetails(doubleRoomAvailability);
-
-        System.out.println("\nSuite Room:");
-        suite.displayRoomDetails(suiteRoomAvailability);
+        // Display updated availability
+        System.out.println("\n=== Updated Room Availability ===");
+        for (Map.Entry<String, Integer> entry : inventory.getRoomAvailability().entrySet()) {
+            System.out.println(entry.getKey() + " : " + entry.getValue());
+        }
 
         System.out.println("\nSystem initialized successfully.");
     }
@@ -51,48 +45,57 @@ public class UseCase2RoomInitialization {
 
 /**
  * ============================================================
- * ABSTRACT CLASS - Room
+ * CLASS - RoomInventory
  * ============================================================
  *
- * Represents a generic hotel room.
- * Defines common attributes and enforces structure.
+ * Acts as the single source of truth for room availability.
+ * Encapsulates inventory logic using HashMap.
  *
- * @version 2.1
+ * @version 3.1
  */
-abstract class Room {
-    protected int numberOfBeds;
-    protected int squareFeet;
-    protected double pricePerNight;
+class RoomInventory {
+    /**
+     * Stores available room count for each room type.
+     * Key => Room type name
+     * Value => Available room count
+     */
+    private Map<String, Integer> roomAvailability;
 
-    public Room(int numberOfBeds, int squareFeet, double pricePerNight) {
-        this.numberOfBeds = numberOfBeds;
-        this.squareFeet = squareFeet;
-        this.pricePerNight = pricePerNight;
+    /**
+     * Constructor initializes the inventory
+     * with default availability values.
+     */
+    public RoomInventory() {
+        roomAvailability = new HashMap<>();
+        initializeInventory();
     }
 
-    // Display details with availability
-    public void displayRoomDetails(int availability) {
-        System.out.println("Beds: " + numberOfBeds);
-        System.out.println("Size: " + squareFeet + " sqft");
-        System.out.println("Price per night: " + pricePerNight);
-        System.out.println("Available: " + availability);
+    /**
+     * Initializes room availability data.
+     * Centralizes inventory setup.
+     */
+    private void initializeInventory() {
+        roomAvailability.put("SingleRoom", 5);
+        roomAvailability.put("DoubleRoom", 3);
+        roomAvailability.put("SuiteRoom", 2);
     }
-}
 
-class SingleRoom extends Room {
-    public SingleRoom() {
-        super(1, 250, 1500.0);
+    /**
+     * Returns the current availability map.
+     *
+     * @return map of room type to available count
+     */
+    public Map<String, Integer> getRoomAvailability() {
+        return roomAvailability;
     }
-}
 
-class DoubleRoom extends Room {
-    public DoubleRoom() {
-        super(2, 400, 2500.0);
-    }
-}
-
-class SuiteRoom extends Room {
-    public SuiteRoom() {
-        super(3, 750, 5000.0);
+    /**
+     * Updates availability for a specific room type.
+     *
+     * @param roomType The room type to update
+     * @param count new availability count
+     */
+    public void updateAvailability(String roomType, int count) {
+        roomAvailability.put(roomType, count);
     }
 }
